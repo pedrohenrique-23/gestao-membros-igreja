@@ -4,20 +4,29 @@
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { memberSchema, MemberFormData } from '@/lib/schemas';
+import { addMember } from '@/actions/members';
+import { useRouter } from 'next/navigation';
 
 export default function PaginaCadastro() {
+  const router = useRouter();
+
   const {
     register,
     handleSubmit,
-    formState: { errors },
+    formState: { errors, isSubmitting }
   } = useForm<MemberFormData>({
     resolver: zodResolver(memberSchema),
   });
 
-  const onSubmit = (data: MemberFormData) => {
-    // Aqui virá a lógica para enviar os dados para o Supabase
-    console.log('Dados do formulário válidos:', data);
-    alert('Formulário enviado! Verifique o console.');
+  const onSubmit = async (data: MemberFormData) => {
+    const result = await addMember(data); // Chamar a Server Action
+
+    if (result.success) {
+      router.push('/cadastro/sucesso');
+    } else {
+      // Exibe uma mensagem de erro geral
+      alert(result.message);
+    }
   };
 
   return (
@@ -113,11 +122,12 @@ export default function PaginaCadastro() {
           {/* Botão de Envio */}
           <div>
             <button
-              type="submit"
-              className="flex w-full justify-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-            >
-              Cadastrar
-            </button>
+            type="submit"
+            disabled={isSubmitting} // 5. Desabilitar o botão durante o envio
+            className="flex w-full justify-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:bg-indigo-400"
+          >
+            {isSubmitting ? 'Cadastrando...' : 'Cadastrar'}
+          </button>
           </div>
         </form>
       </div>
