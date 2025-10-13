@@ -7,13 +7,17 @@ export async function middleware(req: NextRequest) {
   const res = NextResponse.next();
   const supabase = createMiddlewareClient({ req, res });
 
-  // Pega a sessão do usuário com base nos cookies da requisição
   const {
     data: { session },
   } = await supabase.auth.getSession();
 
-  // Se não houver sessão E o usuário estiver tentando acessar uma rota protegida...
-  if (!session && req.nextUrl.pathname.startsWith('/admin')) {
+  // Se não houver sessão E o usuário estiver tentando acessar uma rota protegida
+  // (qualquer rota /admin, EXCETO a própria página de login)...
+  if (
+    !session &&
+    req.nextUrl.pathname.startsWith('/admin') &&
+    req.nextUrl.pathname !== '/admin/login' // <-- ESTA É A CONDIÇÃO ADICIONADA
+  ) {
     // ...redireciona para a página de login.
     const redirectUrl = req.nextUrl.clone();
     redirectUrl.pathname = '/admin/login';
@@ -31,7 +35,6 @@ export async function middleware(req: NextRequest) {
   return res;
 }
 
-// Configuração para definir em quais rotas o middleware deve rodar
 export const config = {
   matcher: ['/admin/:path*', '/admin/login'],
 };

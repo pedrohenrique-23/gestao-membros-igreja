@@ -2,13 +2,14 @@
 
 export default function PaginaAdminDashboard() {
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center">
-      <h1 className="text-4xl font-bold">Bem-vindo ao Dashboard!</h1>
-      <p className="mt-4 text-lg text-gray-600">
-        Esta é uma área protegida. Somente administradores logados podem ver
-        isso.
+    <div>
+      <h2 className="text-3xl font-bold tracking-tight text-gray-900">
+        Visão Geral
+      </h2>
+      <p className="mt-2 text-lg text-gray-600">
+        Bem-vindo ao painel administrativo.
       </p>
-      {/* Aqui construiremos o conteúdo do dashboard na próxima fase */}
+      {/* Os cards de estatísticas serão adicionados aqui */}
     </div>
   );
 }

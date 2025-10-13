@@ -40,3 +40,9 @@ export async function login(data: z.infer<typeof loginSchema>) {
   // Agora, vamos redirecionar o usuário para o dashboard.
   redirect('/admin');
 }
+
+export async function logout() {
+  const supabase = createRouteHandlerClient({ cookies });
+  await supabase.auth.signOut();
+  redirect('/admin/login');
+}
