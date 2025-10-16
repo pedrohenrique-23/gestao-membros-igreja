@@ -35,27 +35,24 @@ export function MemberActionButtons({ member }: { member: Member }) {
     }
   };
 
-  return (
+return (
     <div className="flex items-center justify-end gap-2">
-      {/* Botão de Aprovar */}
       {member.status === 'Pendente' && (
         <form action={approveAction}>
-          <button type="submit" className="rounded bg-green-600 px-2 py-1 text-xs font-semibold text-white shadow-sm hover:bg-green-500">
+          <button type="submit" className="rounded bg-green-600 px-2 py-1 text-xs font-semibold text-white shadow-sm hover:bg-green-500 cursor-pointer">
             Aprovar
           </button>
         </form>
       )}
 
-      {/* Botão/Link de Editar */}
       <Link href={`/admin/membros/${member.id}/editar`}>
-        <span className="rounded bg-blue-600 px-2 py-1 text-xs font-semibold text-white shadow-sm hover:bg-blue-500">
+        <span className="rounded bg-blue-600 px-2 py-1 text-xs font-semibold text-white shadow-sm hover:bg-blue-500 cursor-pointer">
           Editar
         </span>
       </Link>
 
-      {/* Botão de Excluir */}
       <form action={deleteAction}>
-        <button type="submit" className="rounded bg-red-600 px-2 py-1 text-xs font-semibold text-white shadow-sm hover:bg-red-500">
+        <button type="submit" className="rounded bg-red-600 px-2 py-1 text-xs font-semibold text-white shadow-sm hover:bg-red-500 cursor-pointer">
           Excluir
         </button>
       </form>

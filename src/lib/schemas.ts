@@ -6,10 +6,28 @@ export const memberSchema = z.object({
   email: z.string().email({ message: 'Por favor, insira um e-mail válido.' }),
   phone: z.string().optional(),
   address: z.string().optional(),
-  // As datas são strings no formulário, mas serão convertidas.
-  // Opcional significa que podem ser strings vazias.
   birth_date: z.string().optional(),
+  
+  // --- NOVOS CAMPOS ADICIONADOS ---
+  marital_status: z.string().optional(),
+  is_baptized: z.boolean().default(false), // O padrão é 'não'
+  department: z.string().optional(),
+
+  // O campo de data de batismo continua aqui
   baptism_date: z.string().optional(),
+})
+// --- LÓGICA CONDICIONAL ADICIONADA ---
+.refine(data => {
+  // Se 'is_baptized' for true, então 'baptism_date' não pode ser vazio.
+  if (data.is_baptized && (!data.baptism_date || data.baptism_date.trim() === '')) {
+    return false; // Retorna false se a condição não for atendida (inválido)
+  }
+  return true; // Retorna true se estiver tudo certo (válido)
+}, {
+  // Mensagem de erro que será exibida
+  message: 'A data de batismo é obrigatória.',
+  // O campo ao qual a mensagem de erro se aplica
+  path: ['baptism_date'], 
 });
 
 export const loginSchema = z.object({

@@ -1,21 +1,30 @@
-// src/app/admin/membros/page.tsx
-
+// src/app/admin/(panel)/membros/page.tsx
 import { getAllMembers } from '@/actions/members';
-import { MemberActionButtons } from '@/components/ActionButtons'; // 1. Importamos o nosso novo componente
+import { MemberActionButtons } from '@/components/ActionButtons';
+import Link from 'next/link'; // 1. Importar o componente Link
 
-// A página continua sendo um Server Component assíncrono
 export default async function PaginaGerenciarMembros() {
-  // Os dados são buscados no servidor antes da página ser renderizada
   const members = await getAllMembers();
 
   return (
     <div>
-      <h2 className="text-3xl font-bold tracking-tight text-gray-900">
-        Gerenciamento de Membros
-      </h2>
-      <p className="mt-2 text-lg text-gray-600">
-        Visualize, aprove, edite ou remova membros cadastrados no sistema.
-      </p>
+      {/* --- INÍCIO DA MELHORIA DE UI/UX --- */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h2 className="text-3xl font-bold tracking-tight text-gray-900">
+            Gerenciamento de Membros
+          </h2>
+          <p className="mt-2 text-lg text-gray-600">
+            Visualize, aprove, edite ou remova membros cadastrados no sistema.
+          </p>
+        </div>
+        <Link href="/cadastro">
+          <span className="rounded-md bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-700 cursor-pointer"> 
+    + Novo Membro
+          </span>
+        </Link>
+      </div>
+      {/* --- FIM DA MELHORIA DE UI/UX --- */}
 
       {/* Tabela de Membros */}
       <div className="mt-8 flow-root">
@@ -25,26 +34,16 @@ export default async function PaginaGerenciarMembros() {
               <table className="min-w-full divide-y divide-gray-300">
                 <thead className="bg-gray-50">
                   <tr>
-                    <th scope="col" className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6">
-                      Nome
-                    </th>
-                    <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
-                      Status
-                    </th>
-                    <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
-                      Telefone
-                    </th>
-                    <th scope="col" className="relative py-3.5 pl-3 pr-4 sm:pr-6">
-                      <span className="sr-only">Ações</span>
-                    </th>
+                    <th scope="col" className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6">Nome</th>
+                    <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Status</th>
+                    <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Telefone</th>
+                    <th scope="col" className="relative py-3.5 pl-3 pr-4 sm:pr-6"><span className="sr-only">Ações</span></th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-200 bg-white">
                   {members.map((member) => (
                     <tr key={member.id}>
-                      <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6">
-                        {member.name}
-                      </td>
+                      <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6">{member.name}</td>
                       <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
                         <span className={`inline-flex items-center rounded-md px-2 py-1 text-xs font-medium ${
                           member.status === 'Pendente'
@@ -54,11 +53,8 @@ export default async function PaginaGerenciarMembros() {
                           {member.status}
                         </span>
                       </td>
-                      <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                        {member.phone || 'N/A'}
-                      </td>
+                      <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{member.phone || 'N/A'}</td>
                       <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
-                        {/* 2. Aqui é onde usamos o componente, passando os dados do membro específico daquela linha */}
                         <MemberActionButtons member={member} />
                       </td>
                     </tr>
