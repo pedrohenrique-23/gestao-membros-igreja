@@ -3,10 +3,10 @@
 
 import { useForm, useWatch } from 'react-hook-form'; // 1. Adicionar 'useWatch'
 import { zodResolver } from '@hookform/resolvers/zod';
-import { memberSchema, MemberFormData } from '@/lib/schemas';
+import { memberSchema, MemberFormData, Member } from '@/lib/schemas';
 import { updateMember } from '@/actions/members';
 
-export function EditMemberForm({ member }: { member: any }) {
+export function EditMemberForm({ member }: { member: Member }) {
   const {
     register,
     handleSubmit,

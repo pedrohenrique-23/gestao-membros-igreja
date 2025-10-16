@@ -39,3 +39,9 @@ export type LoginFormData = z.infer<typeof loginSchema>;
 
 // Isso cria um tipo TypeScript a partir do nosso schema
 export type MemberFormData = z.infer<typeof memberSchema>;
+
+export type Member = MemberFormData & {
+  id: string;
+  created_at: string;
+  status: string;
+};
