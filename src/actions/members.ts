@@ -2,33 +2,28 @@
 'use server';
 
 import { memberSchema, MemberFormData } from '@/lib/schemas';
-import { supabase } from '@/lib/supabase';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
+import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs';
+import { cookies } from 'next/headers';
 
 // --- CREATE ---
 export async function addMember(data: MemberFormData) {
+  const supabase = createRouteHandlerClient({ cookies }); // Cliente criado aqui
   const validationResult = memberSchema.safeParse(data);
 
   if (!validationResult.success) {
-    return { success: false, message: 'Dados inválidos. Por favor, verifique as informações.' };
+    return { success: false, message: 'Dados inválidos.' };
   }
-
-  const { error } = await supabase.from('members').insert({
-    name: validationResult.data.name,
-    email: validationResult.data.email,
-    phone: validationResult.data.phone,
-    address: validationResult.data.address,
-    birth_date: validationResult.data.birth_date || null,
-    baptism_date: validationResult.data.baptism_date || null,
-  });
+  
+  const { error } = await supabase.from('members').insert(validationResult.data);
 
   if (error) {
     console.error('Supabase Error:', error.message);
     if (error.code === '23505') {
        return { success: false, message: 'Este e-mail já está cadastrado.' };
     }
-    return { success: false, message: 'Ocorreu um erro ao cadastrar. Tente novamente.' };
+    return { success: false, message: 'Ocorreu um erro ao cadastrar.' };
   }
 
   return { success: true, message: 'Cadastro realizado com sucesso!' };
@@ -36,6 +31,7 @@ export async function addMember(data: MemberFormData) {
 
 // --- UPDATE ---
 export async function updateMember(memberId: string, data: MemberFormData) {
+  const supabase = createRouteHandlerClient({ cookies }); // Cliente criado aqui
   const validationResult = memberSchema.safeParse(data);
   if (!validationResult.success) {
     return { success: false, message: 'Dados inválidos.' };
@@ -48,7 +44,7 @@ export async function updateMember(memberId: string, data: MemberFormData) {
 
   if (error) {
     console.error('Erro ao atualizar membro:', error.message);
-    return { success: false, message: 'Não foi possível atualizar o membro no banco de dados.' };
+    return { success: false, message: 'Não foi possível atualizar o membro.' };
   }
 
   revalidatePath('/admin/membros');
@@ -57,6 +53,7 @@ export async function updateMember(memberId: string, data: MemberFormData) {
 }
 
 export async function approveMember(memberId: string) {
+  const supabase = createRouteHandlerClient({ cookies }); // Cliente criado aqui
   if (!memberId) {
     return { success: false, message: 'ID do membro não fornecido.' };
   }
@@ -77,6 +74,7 @@ export async function approveMember(memberId: string) {
 
 // --- DELETE ---
 export async function deleteMember(memberId: string) {
+  const supabase = createRouteHandlerClient({ cookies }); // Cliente criado aqui
   if (!memberId) {
     return { success: false, message: 'ID do membro não fornecido.' };
   }
@@ -97,6 +95,7 @@ export async function deleteMember(memberId: string) {
 
 // --- READ ---
 export async function getMemberStats() {
+  const supabase = createRouteHandlerClient({ cookies }); // Cliente criado aqui
   const { count: totalCount, error: totalError } = await supabase
     .from('members')
     .select('*', { count: 'exact', head: true });
@@ -115,6 +114,7 @@ export async function getMemberStats() {
 }
 
 export async function getAllMembers() {
+  const supabase = createRouteHandlerClient({ cookies }); // Cliente criado aqui
   const { data: members, error } = await supabase
     .from('members')
     .select('*')
@@ -129,6 +129,7 @@ export async function getAllMembers() {
 }
 
 export async function getMemberById(memberId: string) {
+  const supabase = createRouteHandlerClient({ cookies }); // Cliente criado aqui
   const { data, error } = await supabase
     .from('members')
     .select('*')
