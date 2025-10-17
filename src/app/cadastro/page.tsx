@@ -2,8 +2,7 @@
 'use client';
 
 import { useForm, useWatch, SubmitHandler } from 'react-hook-form'; 
-import { zodResolver } from '@hookform/resolvers/zod';
-import { memberSchema, MemberFormData } from '@/lib/schemas';
+import { MemberFormData } from '@/lib/schemas';
 import { addMember } from '@/actions/members';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
@@ -17,7 +16,7 @@ export default function PaginaCadastro() {
     control,
     formState: { errors, isSubmitting },
   } = useForm<MemberFormData>({
-    resolver: zodResolver(memberSchema), // Zod como fonte da verdade
+    // REMOVEMOS O ZODRESOLVER DAQUI
     defaultValues: {
       is_baptized: false,
       marital_status: '',
@@ -48,18 +47,21 @@ export default function PaginaCadastro() {
         <Image src="/images/logo-ieu.jpg" alt="Logo da Igreja" width={70} height={70} className="mx-auto mb-4 rounded-full" />
         <h1 className="mb-2 text-center text-3xl font-bold text-gray-800">Cadastro de Novo Membro</h1>
         <p className="mb-8 text-center text-gray-600">Preencha o formulário abaixo para iniciar seu cadastro.</p>
+
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-          {/* Formulário completo com todos os campos */}
           <div>
             <label htmlFor="name" className="block text-sm font-medium text-gray-700">Nome Completo</label>
-            <input id="name" type="text" {...register('name')} className="mt-1 block w-full rounded-md border-gray-300 text-gray-900 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"/>
+            {/* ADICIONAMOS A VALIDAÇÃO NATIVA ABAIXO */}
+            <input id="name" type="text" {...register('name', { required: 'O nome é obrigatório' })} className="mt-1 block w-full rounded-md border-gray-300 text-gray-900 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"/>
             {errors.name && <p className="mt-2 text-sm text-red-600">{errors.name.message}</p>}
           </div>
           <div>
             <label htmlFor="email" className="block text-sm font-medium text-gray-700">E-mail</label>
-            <input id="email" type="email" {...register('email')} className="mt-1 block w-full rounded-md border-gray-300 text-gray-900 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"/>
+            {/* ADICIONAMOS A VALIDAÇÃO NATIVA ABAIXO */}
+            <input id="email" type="email" {...register('email', { required: 'O e-mail é obrigatório' })} className="mt-1 block w-full rounded-md border-gray-300 text-gray-900 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"/>
             {errors.email && <p className="mt-2 text-sm text-red-600">{errors.email.message}</p>}
           </div>
+          {/* O resto dos campos não obrigatórios continua igual */}
           <div>
             <label htmlFor="phone" className="block text-sm font-medium text-gray-700">Telefone (Opcional)</label>
             <input id="phone" type="tel" {...register('phone')} className="mt-1 block w-full rounded-md border-gray-300 text-gray-900 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"/>
