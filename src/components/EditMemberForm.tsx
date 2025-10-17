@@ -1,7 +1,7 @@
 // src/components/EditMemberForm.tsx
 'use client';
 
-import { useForm, useWatch } from 'react-hook-form'; // 1. Adicionar 'useWatch'
+import { useForm, useWatch } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { memberSchema, MemberFormData, Member } from '@/lib/schemas';
 import { updateMember } from '@/actions/members';
@@ -10,11 +10,10 @@ export function EditMemberForm({ member }: { member: Member }) {
   const {
     register,
     handleSubmit,
-    control, // 2. Adicionar 'control'
+    control,
     formState: { errors, isSubmitting },
   } = useForm<MemberFormData>({
-    resolver: zodResolver(memberSchema),
-    // O pré-preenchimento agora inclui os novos campos
+    resolver: zodResolver<MemberFormData>(memberSchema), // <-- Correção de tipagem aplicada
     defaultValues: {
       name: member.name,
       email: member.email,
@@ -28,7 +27,6 @@ export function EditMemberForm({ member }: { member: Member }) {
     },
   });
 
-  // 3. Mesma lógica de 'assistir' ao campo de batismo
   const isBaptized = useWatch({
     control,
     name: 'is_baptized',
@@ -44,7 +42,6 @@ export function EditMemberForm({ member }: { member: Member }) {
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-       {/* --- CAMPOS EXISTENTES --- */}
        <div>
             <label htmlFor="name" className="block text-sm font-medium text-gray-700">Nome Completo</label>
             <input id="name" type="text" {...register('name')} className="mt-1 block w-full rounded-md border-gray-300 text-gray-900 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" />
@@ -68,7 +65,6 @@ export function EditMemberForm({ member }: { member: Member }) {
             <input id="birth_date" type="date" {...register('birth_date')} className="mt-1 block w-full rounded-md border-gray-300 text-gray-900 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" />
         </div>
 
-      {/* --- NOVOS CAMPOS ADICIONADOS AO FORMULÁRIO DE EDIÇÃO --- */}
       <div>
         <label htmlFor="marital_status" className="block text-sm font-medium text-gray-700">Estado Civil</label>
         <select id="marital_status" {...register('marital_status')} className="mt-1 block w-full rounded-md border-gray-300 text-gray-900 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
