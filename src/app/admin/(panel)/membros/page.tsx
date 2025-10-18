@@ -3,16 +3,14 @@ import { getAllMembers } from '@/actions/members';
 import { MemberActionButtons } from '@/components/ActionButtons';
 import Link from 'next/link';
 
-// A página recebe 'searchParams' para ler a query da URL
-export default async function PaginaGerenciarMembros({
-  searchParams,
-}: {
+// 1. Criamos um tipo dedicado para as props da página
+type Props = {
   searchParams?: { q?: string }; 
-}) {
-  // Pega o termo de busca da URL (ou string vazia)
+};
+
+// 2. Usamos o nosso novo tipo 'Props' na assinatura da função
+export default async function PaginaGerenciarMembros({ searchParams }: Props) {
   const searchTerm = searchParams?.q || ''; 
-  
-  // Passa o termo de busca para a action
   const members = await getAllMembers(searchTerm); 
 
   return (
@@ -38,9 +36,9 @@ export default async function PaginaGerenciarMembros({
         <form className="flex gap-2">
           <input
             type="text"
-            name="q" // Nome do parâmetro na URL
+            name="q"
             placeholder="Buscar por nome..."
-            defaultValue={searchTerm} // Mantém o valor no campo após a busca
+            defaultValue={searchTerm}
             className="block w-full rounded-md border-gray-300 text-gray-900 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
           />
           <button
@@ -55,7 +53,7 @@ export default async function PaginaGerenciarMembros({
       {/* Tabela de Membros */}
       <div className="mt-8 flow-root">
         <div className="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
-          <div className="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
+          <div className="inline-block min-w-full py-2 align-middle sm:px-6 lg:-px-8">
             <div className="overflow-hidden shadow ring-1 ring-black ring-opacity-5 sm:rounded-lg">
               <table className="min-w-full divide-y divide-gray-300">
                 <thead className="bg-gray-50">
@@ -83,8 +81,6 @@ export default async function PaginaGerenciarMembros({
                       </td>
                     </tr>
                   ))}
-                  
-                  {/* Mensagem se não houver resultados */}
                   {members.length === 0 && (
                     <tr>
                       <td colSpan={4} className="px-3 py-4 text-center text-sm text-gray-500 sm:pl-6">
