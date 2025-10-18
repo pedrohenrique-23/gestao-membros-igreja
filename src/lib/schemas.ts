@@ -1,6 +1,19 @@
 // src/lib/schemas.ts
 import { z } from 'zod';
 
+export const departments = [
+  'Jovens',
+  'Louvor',
+  'MAIS',
+  'Departamento Feminino',
+  'Diaconato',
+  'Mídia',
+  'Departamento de Casais',
+  'Departamento Infantil',
+  'Pastores/Presbíteros',
+  'Ação Social',
+];
+
 export const memberSchema = z.object({
   name: z.string().min(3, { message: 'O nome deve ter no mínimo 3 caracteres.' }),
   email: z.string().email({ message: 'Por favor, insira um e-mail válido.' }),
@@ -9,7 +22,7 @@ export const memberSchema = z.object({
   birth_date: z.string().optional(),
   marital_status: z.string().optional(),
   is_baptized: z.boolean().default(false),
-  department: z.string().optional(),
+  department: z.array(z.string()).optional(),
   baptism_date: z.string().optional(),
 })
 .refine(data => {
@@ -34,4 +47,5 @@ export type Member = MemberFormData & {
   created_at: string;
   status: string;
   is_baptized: boolean | null; // Ajuste para o tipo do Supabase
+  department: string[] | null; // Ajuste para o tipo do Supabase
 };

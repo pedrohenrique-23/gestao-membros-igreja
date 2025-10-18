@@ -2,7 +2,8 @@
 'use client';
 
 import { useForm, useWatch, SubmitHandler } from 'react-hook-form';
-import { MemberFormData, Member } from '@/lib/schemas';
+// REMOVEMOS O ZODRESOLVER DO IMPORT
+import { MemberFormData, Member, departments } from '@/lib/schemas'; // Schema ainda usado para tipos
 import { updateMember } from '@/actions/members';
 
 export function EditMemberForm({ member }: { member: Member }) {
@@ -12,7 +13,7 @@ export function EditMemberForm({ member }: { member: Member }) {
     control,
     formState: { errors, isSubmitting },
   } = useForm<MemberFormData>({
-    // REMOVEMOS O ZODRESOLVER DAQUI
+    // REMOVEMOS A LINHA DO RESOLVER
     defaultValues: {
       name: member.name || '',
       email: member.email || '',
@@ -22,14 +23,16 @@ export function EditMemberForm({ member }: { member: Member }) {
       baptism_date: member.baptism_date || '',
       marital_status: member.marital_status || '',
       is_baptized: member.is_baptized || false,
-      department: member.department || '',
+      department: member.department || [],
     },
   });
 
   const isBaptized = useWatch({ control, name: 'is_baptized' });
 
   const onSubmit: SubmitHandler<MemberFormData> = async (data) => {
-    const result = await updateMember(member.id, data);
+    // Garante que department seja sempre um array
+    const dataToSend = { ...data, department: data.department || [] };
+    const result = await updateMember(member.id, dataToSend); 
     if (result && !result.success) {
       alert(result.message || 'Falha ao atualizar o membro.');
     }
@@ -39,17 +42,23 @@ export function EditMemberForm({ member }: { member: Member }) {
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
       <div>
         <label htmlFor="name" className="block text-sm font-medium text-gray-700">Nome Completo</label>
-        {/* ADICIONAMOS A VALIDAÇÃO NATIVA ABAIXO */}
+        {/* Validação Nativa Adicionada */}
         <input id="name" type="text" {...register('name', { required: 'O nome é obrigatório' })} className="mt-1 block w-full rounded-md border-gray-300 text-gray-900 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" />
         {errors.name && <p className="mt-2 text-sm text-red-600">{errors.name.message}</p>}
       </div>
       <div>
         <label htmlFor="email" className="block text-sm font-medium text-gray-700">E-mail</label>
-        {/* ADICIONAMOS A VALIDAÇÃO NATIVA ABAIXO */}
-        <input id="email" type="email" {...register('email', { required: 'O e-mail é obrigatório' })} className="mt-1 block w-full rounded-md border-gray-300 text-gray-900 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" />
+        {/* Validação Nativa Adicionada */}
+        <input id="email" type="email" {...register('email', { 
+          required: 'O e-mail é obrigatório',
+          pattern: { // Adiciona validação básica de formato de email
+            value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+            message: "Endereço de e-mail inválido"
+          }
+        })} className="mt-1 block w-full rounded-md border-gray-300 text-gray-900 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" />
         {errors.email && <p className="mt-2 text-sm text-red-600">{errors.email.message}</p>}
       </div>
-      {/* O resto dos campos continua igual */}
+      {/* Outros campos sem validação nativa */}
       <div>
         <label htmlFor="phone" className="block text-sm font-medium text-gray-700">Telefone</label>
         <input id="phone" type="tel" {...register('phone')} className="mt-1 block w-full rounded-md border-gray-300 text-gray-900 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" />
@@ -80,24 +89,21 @@ export function EditMemberForm({ member }: { member: Member }) {
         <div>
           <label htmlFor="baptism_date" className="block text-sm font-medium text-gray-700">Data de Batismo</label>
           <input id="baptism_date" type="date" {...register('baptism_date')} className="mt-1 block w-full rounded-md border-gray-300 text-gray-900 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"/>
-          {errors.baptism_date && <p className="mt-2 text-sm text-red-600">{errors.baptism_date.message}</p>}
+           {/* A mensagem de erro do Zod para este campo não aparecerá dinamicamente */}
         </div>
       )}
-      <div>
-        <label htmlFor="department" className="block text-sm font-medium text-gray-700">Departamento</label>
-        <select id="department" {...register('department')} className="mt-1 block w-full rounded-md border-gray-300 text-gray-900 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
-          <option value="">Nenhum</option>
-          <option value="Jovens">Jovens</option>
-          <option value="Louvor">Louvor</option>
-          <option value="MAIS">MAIS</option>
-          <option value="Departamento Feminino">Departamento Feminino</option>
-          <option value="Diaconato">Diaconato</option>
-          <option value="Mídia">Mídia</option>
-          <option value="Departamento de Casais">Departamento de Casais</option>
-          <option value="Departamento Infantil">Departamento Infantil</option>
-          <option value="Pastores/Presbíteros">Pastores/Presbíteros</option>
-          <option value="Ação Social">Ação Social</option>
-        </select>
+      <div className="space-y-3">
+        <label className="block text-sm font-medium text-gray-700">
+          Departamentos (selecione um ou mais)
+        </label>
+        <div className="grid grid-cols-2 gap-x-4 gap-y-2 sm:grid-cols-3">
+          {departments.map((dept) => (
+            <div key={dept} className="flex items-center gap-2">
+              <input id={`dept-edit-${dept}`} type="checkbox" {...register('department')} value={dept} className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-600"/>
+              <label htmlFor={`dept-edit-${dept}`} className="text-sm text-gray-900">{dept}</label>
+            </div>
+          ))}
+        </div>
       </div>
       <div>
         <button type="submit" disabled={isSubmitting} className="flex w-full justify-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:bg-indigo-400 cursor-pointer">

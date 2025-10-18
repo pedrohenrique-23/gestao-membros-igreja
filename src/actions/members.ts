@@ -1,3 +1,4 @@
+// src/actions/members.ts
 'use server';
 
 import { memberSchema, MemberFormData } from '@/lib/schemas';
@@ -6,17 +7,17 @@ import { redirect } from 'next/navigation';
 import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs';
 import { cookies } from 'next/headers';
 
-// FUNÇÕES DE ESCRITA (CREATE, UPDATE, DELETE) usam o cliente de action
+// Cliente para funções de escrita (actions)
 async function getSupabaseActionClient() {
   return createRouteHandlerClient({ cookies });
 }
 
-// FUNÇÕES DE LEITURA (READ) usam o cliente de action também, pois são chamadas em Server Components
-// que têm acesso ao contexto da requisição (cookies).
+// Cliente para funções de leitura (chamadas em Server Components)
 async function getSupabaseReadClient() {
   return createRouteHandlerClient({ cookies });
 }
 
+// --- CREATE ---
 export async function addMember(data: MemberFormData) {
   const supabase = await getSupabaseActionClient();
   const validationResult = memberSchema.safeParse(data);
@@ -30,6 +31,7 @@ export async function addMember(data: MemberFormData) {
   return { success: true, message: 'Cadastro realizado com sucesso!' };
 }
 
+// --- UPDATE ---
 export async function updateMember(memberId: string, data: MemberFormData) {
   const supabase = await getSupabaseActionClient();
   const validationResult = memberSchema.safeParse(data);
@@ -56,6 +58,7 @@ export async function approveMember(memberId: string) {
   return { success: true };
 }
 
+// --- DELETE ---
 export async function deleteMember(memberId: string) {
   const supabase = await getSupabaseActionClient();
   if (!memberId) return { success: false, message: 'ID do membro não fornecido.' };
@@ -68,6 +71,7 @@ export async function deleteMember(memberId: string) {
   return { success: true };
 }
 
+// --- READ ---
 export async function getMemberStats() {
   const supabase = await getSupabaseReadClient();
   const { count: totalCount, error: totalError } = await supabase.from('members').select('*', { count: 'exact', head: true });
@@ -79,15 +83,30 @@ export async function getMemberStats() {
   return { totalCount: totalCount ?? 0, pendingCount: pendingCount ?? 0 };
 }
 
-export async function getAllMembers() {
+// *** FUNÇÃO MODIFICADA PARA BUSCA ***
+export async function getAllMembers(searchTerm?: string) {
   const supabase = await getSupabaseReadClient();
-  const { data: members, error } = await supabase.from('members').select('*').order('created_at', { ascending: false });
+
+  let query = supabase
+    .from('members')
+    .select('*')
+    .order('created_at', { ascending: false });
+
+  if (searchTerm && searchTerm.trim() !== '') {
+    // Adiciona o filtro ILIKE para buscar nomes que contenham o termo
+    query = query.ilike('name', `%${searchTerm}%`);
+  }
+
+  const { data: members, error } = await query;
+
   if (error) {
     console.error('Erro ao buscar membros:', error.message);
     return [];
   }
+
   return members || [];
 }
+// *** FIM DA FUNÇÃO MODIFICADA ***
 
 export async function getMemberById(memberId: string) {
   const supabase = await getSupabaseReadClient();
