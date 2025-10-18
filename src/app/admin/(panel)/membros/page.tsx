@@ -2,12 +2,13 @@
 import { getAllMembers } from '@/actions/members';
 import { MemberActionButtons } from '@/components/ActionButtons';
 import Link from 'next/link';
-import type { PageProps } from 'next'; // 1. Importar o tipo oficial PageProps
+// REMOVEMOS O IMPORT DO PageProps daqui
 
-// 2. Usar PageProps para tipar as propriedades da página
-// O Next.js infere automaticamente a estrutura de searchParams aqui
-export default async function PaginaGerenciarMembros({ searchParams }: PageProps) {
-  // 3. Ajustar o acesso a 'q' para lidar com searchParams podendo ser string, array ou undefined
+// REMOVEMOS A TIPAGEM EXPLÍCITA PageProps DA ASSINATURA DA FUNÇÃO
+// Deixamos o Next.js inferir os tipos de searchParams
+// Usamos uma tipagem inline mais simples para guiar o TS localmente
+export default async function PaginaGerenciarMembros({ searchParams }: { searchParams?: { q?: string } }) {
+  // A lógica para acessar searchParams continua a mesma
   const query = searchParams?.q;
   const searchTerm = typeof query === 'string' ? query : ''; 
 
