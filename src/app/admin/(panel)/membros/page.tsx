@@ -2,16 +2,16 @@
 import { getAllMembers } from '@/actions/members';
 import { MemberActionButtons } from '@/components/ActionButtons';
 import Link from 'next/link';
+import { headers } from 'next/headers'; 
 
-// Tipagem segura para searchParams
-type Props = {
-  searchParams?: Record<string, string | undefined>;
-};
+// Sem PageProps, Next.js infere searchParams
+export default async function PaginaGerenciarMembros({ searchParams }: { searchParams?: { q?: string } }) { 
+  // A action pega o searchTerm via headers
+  const members = await getAllMembers(); 
 
-export default async function PaginaGerenciarMembros({ searchParams }: Props) {
-  // Pegando a query de busca
-  const query = searchParams?.q ?? '';
-  const members = await getAllMembers(query);
+  // Pegamos o searchTerm aqui APENAS para o defaultValue
+  // Acesso direto a searchParams aqui é seguro neste contexto
+  const searchTerm = searchParams?.q || '';
 
   return (
     <div>
@@ -38,7 +38,7 @@ export default async function PaginaGerenciarMembros({ searchParams }: Props) {
             type="text"
             name="q"
             placeholder="Buscar por nome..."
-            defaultValue={query}
+            defaultValue={searchTerm} 
             className="block w-full rounded-md border-gray-300 text-gray-900 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
           />
           <button
@@ -58,40 +58,24 @@ export default async function PaginaGerenciarMembros({ searchParams }: Props) {
               <table className="min-w-full divide-y divide-gray-300">
                 <thead className="bg-gray-50">
                   <tr>
-                    <th scope="col" className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6">
-                      Nome
-                    </th>
-                    <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
-                      Status
-                    </th>
-                    <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
-                      Telefone
-                    </th>
-                    <th scope="col" className="relative py-3.5 pl-3 pr-4 sm:pr-6">
-                      <span className="sr-only">Ações</span>
-                    </th>
+                    <th scope="col" className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6">Nome</th>
+                    <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Status</th>
+                    <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Telefone</th>
+                    <th scope="col" className="relative py-3.5 pl-3 pr-4 sm:pr-6"><span className="sr-only">Ações</span></th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-200 bg-white">
                   {members.map((member) => (
                     <tr key={member.id}>
-                      <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6">
-                        {member.name}
-                      </td>
+                      <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6">{member.name}</td>
                       <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                        <span
-                          className={`inline-flex items-center rounded-md px-2 py-1 text-xs font-medium ${
-                            member.status === 'Pendente'
-                              ? 'bg-yellow-100 text-yellow-800'
-                              : 'bg-green-100 text-green-800'
-                          }`}
-                        >
+                        <span className={`inline-flex items-center rounded-md px-2 py-1 text-xs font-medium ${
+                          member.status === 'Pendente' ? 'bg-yellow-100 text-yellow-800' : 'bg-green-100 text-green-800'
+                        }`}>
                           {member.status}
                         </span>
                       </td>
-                      <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                        {member.phone || 'N/A'}
-                      </td>
+                      <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{member.phone || 'N/A'}</td>
                       <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
                         <MemberActionButtons member={member} />
                       </td>
@@ -100,7 +84,7 @@ export default async function PaginaGerenciarMembros({ searchParams }: Props) {
                   {members.length === 0 && (
                     <tr>
                       <td colSpan={4} className="px-3 py-4 text-center text-sm text-gray-500 sm:pl-6">
-                        Nenhum membro encontrado {query && `com o nome "${query}"`}.
+                        Nenhum membro encontrado {searchTerm && `com o nome "${searchTerm}"`}.
                       </td>
                     </tr>
                   )}

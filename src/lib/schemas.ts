@@ -1,6 +1,7 @@
 // src/lib/schemas.ts
 import { z } from 'zod';
 
+// Lista centralizada dos departamentos
 export const departments = [
   'Jovens',
   'Louvor',
@@ -22,7 +23,9 @@ export const memberSchema = z.object({
   birth_date: z.string().optional(),
   marital_status: z.string().optional(),
   is_baptized: z.boolean().default(false),
-  department: z.array(z.string()).optional(),
+  
+  department: z.array(z.string()).optional(), // Tipo array aqui
+
   baptism_date: z.string().optional(),
 })
 .refine(data => {
@@ -42,10 +45,12 @@ export const loginSchema = z.object({
 
 export type LoginFormData = z.infer<typeof loginSchema>;
 export type MemberFormData = z.infer<typeof memberSchema>;
-export type Member = MemberFormData & {
+
+// Tipo Member ajustado para array de department
+export type Member = Omit<MemberFormData, 'department'> & {
   id: string;
   created_at: string;
   status: string;
-  is_baptized: boolean | null; // Ajuste para o tipo do Supabase
-  department: string[] | null; // Ajuste para o tipo do Supabase
+  is_baptized: boolean | null; 
+  department: string[] | null; 
 };

@@ -2,8 +2,7 @@
 'use client';
 
 import { useForm, useWatch, SubmitHandler } from 'react-hook-form'; 
-// REMOVEMOS O ZODRESOLVER DO IMPORT
-import { MemberFormData, departments } from '@/lib/schemas'; // Schema ainda usado para o tipo
+import { MemberFormData, departments } from '@/lib/schemas'; 
 import { addMember } from '@/actions/members';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
@@ -17,7 +16,7 @@ export default function PaginaCadastro() {
     control,
     formState: { errors, isSubmitting },
   } = useForm<MemberFormData>({
-    // REMOVEMOS A LINHA DO RESOLVER
+    // SEM ZODRESOLVER
     defaultValues: {
       is_baptized: false,
       marital_status: '',
@@ -34,7 +33,6 @@ export default function PaginaCadastro() {
   const isBaptized = useWatch({ control, name: 'is_baptized' });
 
   const onSubmit: SubmitHandler<MemberFormData> = async (data) => {
-    // Garante que department seja sempre um array
     const dataToSend = { ...data, department: data.department || [] };
     const result = await addMember(dataToSend); 
     if (result.success) {
@@ -54,23 +52,17 @@ export default function PaginaCadastro() {
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
           <div>
             <label htmlFor="name" className="block text-sm font-medium text-gray-700">Nome Completo</label>
-            {/* Validação Nativa Adicionada */}
             <input id="name" type="text" {...register('name', { required: 'O nome é obrigatório' })} className="mt-1 block w-full rounded-md border-gray-300 text-gray-900 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"/>
             {errors.name && <p className="mt-2 text-sm text-red-600">{errors.name.message}</p>}
           </div>
           <div>
             <label htmlFor="email" className="block text-sm font-medium text-gray-700">E-mail</label>
-            {/* Validação Nativa Adicionada */}
             <input id="email" type="email" {...register('email', { 
               required: 'O e-mail é obrigatório',
-              pattern: { // Adiciona validação básica de formato de email
-                value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                message: "Endereço de e-mail inválido"
-              }
+              pattern: { value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i, message: "Endereço de e-mail inválido" }
             })} className="mt-1 block w-full rounded-md border-gray-300 text-gray-900 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"/>
             {errors.email && <p className="mt-2 text-sm text-red-600">{errors.email.message}</p>}
           </div>
-          {/* Outros campos sem validação nativa */}
           <div>
             <label htmlFor="phone" className="block text-sm font-medium text-gray-700">Telefone (Opcional)</label>
             <input id="phone" type="tel" {...register('phone')} className="mt-1 block w-full rounded-md border-gray-300 text-gray-900 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"/>
@@ -100,9 +92,8 @@ export default function PaginaCadastro() {
           {isBaptized && (
             <div>
               <label htmlFor="baptism_date" className="block text-sm font-medium text-gray-700">Data de Batismo</label>
-              {/* Validação condicional Zod não funcionará aqui em tempo real */}
               <input id="baptism_date" type="date" {...register('baptism_date')} className="mt-1 block w-full rounded-md border-gray-300 text-gray-900 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"/>
-              {/* A mensagem de erro do Zod para este campo não aparecerá dinamicamente */}
+              {/* Validação Zod não será exibida aqui */}
             </div>
           )}
           <div className="space-y-3">
