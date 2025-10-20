@@ -3,9 +3,17 @@ import { getMemberById } from '@/actions/members';
 import Link from 'next/link';
 import { EditMemberForm } from '@/components/EditMemberForm';
 
-// 🚀 Deixe o Next.js inferir automaticamente o tipo das props
-export default async function PaginaEditarMembro({ params }: { params: { id: string } }) {
-  const member = await getMemberById(params.id);
+// ✅ Cria um tipo manual para as props (sem usar PageProps)
+type EditMemberPageProps = {
+  params: {
+    id: string;
+  };
+};
+
+// ✅ A função assíncrona recebe props tipadas manualmente
+export default async function EditMemberPage({ params }: EditMemberPageProps) {
+  const { id } = params;
+  const member = await getMemberById(id);
 
   if (!member) {
     return (
