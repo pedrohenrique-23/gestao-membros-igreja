@@ -11,7 +11,7 @@ import { supabase } from '@/lib/supabase'; // Importar o cliente de leitura
 // Cliente para FUNÇÕES DE ESCRITA (continua igual)
 async function getSupabaseActionClient() {
   return createRouteHandlerClient({ cookies });
-}
+} 
 
 // --- CREATE ---
 export async function addMember(data: MemberFormData) {

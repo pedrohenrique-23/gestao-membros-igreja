@@ -1,20 +1,12 @@
 // src/app/admin/(panel)/membros/[id]/editar/page.tsx
-import { getMemberById } from '@/actions/members'
-import Link from 'next/link'
-import { EditMemberForm } from '@/components/EditMemberForm'
+import { getMemberById } from '@/actions/members';
+import Link from 'next/link';
+import { EditMemberForm } from '@/components/EditMemberForm';
 
-// ✅ Tipagem direta para o parâmetro dinâmico [id]
-export default async function PaginaEditarMembro({
-  params,
-}: {
-  params: { id: string }
-}) {
-  const { id } = params
+// 🚀 Deixe o Next.js inferir automaticamente o tipo das props
+export default async function PaginaEditarMembro({ params }: { params: { id: string } }) {
+  const member = await getMemberById(params.id);
 
-  // ✅ Busca o membro pelo ID
-  const member = await getMemberById(id)
-
-  // ✅ Tratamento caso o membro não seja encontrado
   if (!member) {
     return (
       <div>
@@ -27,10 +19,9 @@ export default async function PaginaEditarMembro({
           Voltar para a lista de membros
         </Link>
       </div>
-    )
+    );
   }
 
-  // ✅ Renderização do formulário de edição
   return (
     <div>
       <h2 className="text-3xl font-bold tracking-tight text-gray-900">
@@ -41,5 +32,5 @@ export default async function PaginaEditarMembro({
         <EditMemberForm member={member} />
       </div>
     </div>
-  )
+  );
 }
