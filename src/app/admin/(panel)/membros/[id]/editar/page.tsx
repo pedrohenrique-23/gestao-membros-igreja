@@ -2,14 +2,10 @@
 import { getMemberById } from '@/actions/members';
 import Link from 'next/link';
 import { EditMemberForm } from '@/components/EditMemberForm';
-// REMOVEMOS PageProps
+// REMOVEMOS A IMPORTAÇÃO DE PageProps ou a definição de 'type Props'
 
-// Adicionamos tipo explícito para params aqui
-type Props = {
-  params: { id: string };
-};
-
-export default async function PaginaEditarMembro({ params }: Props) {
+// Usamos a tipagem inline simples para params, deixando o Next.js inferir o resto
+export default async function PaginaEditarMembro({ params }: { params: { id: string } }) {
   const member = await getMemberById(params.id);
 
   if (!member) {
@@ -29,8 +25,9 @@ export default async function PaginaEditarMembro({ params }: Props) {
       <h2 className="text-3xl font-bold tracking-tight text-gray-900">
         Editar Membro: <span className="text-indigo-600">{member.name}</span>
       </h2>
-      
+
       <div className="mt-8 max-w-2xl">
+        {/* Passamos o membro encontrado para o formulário */}
         <EditMemberForm member={member} />
       </div>
     </div>

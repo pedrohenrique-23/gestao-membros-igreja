@@ -2,16 +2,15 @@
 import { getAllMembers } from '@/actions/members';
 import { MemberActionButtons } from '@/components/ActionButtons';
 import Link from 'next/link';
-import { headers } from 'next/headers'; 
+// REMOVEMOS import { headers } from 'next/headers';
 
-// Sem PageProps, Next.js infere searchParams
-export default async function PaginaGerenciarMembros({ searchParams }: { searchParams?: { q?: string } }) { 
-  // A action pega o searchTerm via headers
-  const members = await getAllMembers(); 
-
-  // Pegamos o searchTerm aqui APENAS para o defaultValue
-  // Acesso direto a searchParams aqui é seguro neste contexto
+// Usamos tipagem inline simples, deixando o Next.js inferir o tipo completo
+export default async function PaginaGerenciarMembros({ searchParams }: { searchParams?: { q?: string } }) {
+  // Acesso direto a searchParams aqui
   const searchTerm = searchParams?.q || '';
+
+  // Passamos o searchTerm novamente para a action getAllMembers
+  const members = await getAllMembers(searchTerm);
 
   return (
     <div>
@@ -31,14 +30,14 @@ export default async function PaginaGerenciarMembros({ searchParams }: { searchP
         </Link>
       </div>
 
-      {/* Formulário de Busca */}
+      {/* Formulário de Busca (defaultValue usa o searchTerm lido dos searchParams) */}
       <div className="mt-6">
         <form className="flex gap-2">
           <input
             type="text"
             name="q"
             placeholder="Buscar por nome..."
-            defaultValue={searchTerm} 
+            defaultValue={searchTerm}
             className="block w-full rounded-md border-gray-300 text-gray-900 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
           />
           <button
