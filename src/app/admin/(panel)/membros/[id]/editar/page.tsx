@@ -3,10 +3,10 @@ import { getMemberById } from '@/actions/members';
 import Link from 'next/link';
 import { EditMemberForm } from '@/components/EditMemberForm';
 
-// REMOVEMOS COMPLETAMENTE A TIPAGEM DAS PROPS DA FUNÇÃO
-export default async function PaginaEditarMembro({ params }: { params: { id: string } }) { 
-  // Acessamos params.id diretamente
-  const member = await getMemberById(params.id);
+// ✅ NÃO declarar nenhum tipo na função — o Next infere automaticamente.
+export default async function Page({ params }: { params: { id: string } }) {
+  const { id } = params;
+  const member = await getMemberById(id);
 
   if (!member) {
     return (
@@ -20,12 +20,14 @@ export default async function PaginaEditarMembro({ params }: { params: { id: str
     );
   }
 
+  // O tipo 'member' aqui será inferido corretamente pela Promise resolvida
+  // e o EditMemberForm espera o tipo 'Member', o que deve ser compatível.
   return (
     <div>
       <h2 className="text-3xl font-bold tracking-tight text-gray-900">
         Editar Membro: <span className="text-indigo-600">{member.name}</span>
       </h2>
-
+      
       <div className="mt-8 max-w-2xl">
         <EditMemberForm member={member} />
       </div>
