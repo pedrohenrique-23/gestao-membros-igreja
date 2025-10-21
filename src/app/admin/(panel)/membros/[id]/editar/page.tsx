@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { EditMemberForm } from '@/components/EditMemberForm';
 
 // ✅ NÃO declarar nenhum tipo na função — o Next infere automaticamente.
-export default async function Page({ params }: { params: { id: string } }) {
+export default async function Page({ params }) {
   const { id } = params;
   const member = await getMemberById(id);
 
